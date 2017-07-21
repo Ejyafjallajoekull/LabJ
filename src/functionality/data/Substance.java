@@ -1,16 +1,12 @@
 package functionality.data;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import functionality.housekeeping.logging.LoggingHandler;
 
-<<<<<<< HEAD
+
 public class Substance extends PackEntry{
-=======
-public class Substance {
->>>>>>> branch 'master' of \\192.168.1.5\LabJ\.git
 // a chemical substance
 	
 	// BigDecimal for exact representation of values
