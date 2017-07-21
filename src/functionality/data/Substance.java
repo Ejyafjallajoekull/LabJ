@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import functionality.housekeeping.logging.LoggingHandler;
 
 public class Substance {
-// a chemical sbstance
+// a chemical substance
 	
 	// BigDecimal for exact representation of values
 	private BigDecimal molecularWeight = new BigDecimal(0); // the molecular weight
