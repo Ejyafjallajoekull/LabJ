@@ -30,7 +30,7 @@ import org.xml.sax.SAXException;
 
 import functionality.housekeeping.logging.LoggingHandler;
 
-public class SubstancePack {
+public class SubstancePack extends Pack{
 
 	// fields
 	private ArrayList<Substance> substances = new ArrayList<Substance>(); // a list of all substances in the pack
@@ -49,12 +49,7 @@ public class SubstancePack {
 	
 	// constructor
 	public SubstancePack(File file) {
-		if (file != null) {
-			this.substanceFile = file;
-			this.load();
-		} else {
-			LoggingHandler.getLog().warning("This substance pack has no corresponding file");
-		}	
+		super(file);
 	}
 	
 	// methods
@@ -75,7 +70,7 @@ public class SubstancePack {
 	}
 	
 	// loads substances from XML
-	private void load() {
+	public boolean load() {
 		// only load a file if it exists 
 //		if (this.substanceFile.exists() && this.substanceFile.isFile()) {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -180,6 +175,7 @@ public class SubstancePack {
 //		} else {
 	//		this.packDoc = null;
 //		}
+		return false;
 	}
 	
 	// save this pack to XML
