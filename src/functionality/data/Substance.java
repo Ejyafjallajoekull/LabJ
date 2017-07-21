@@ -13,32 +13,35 @@ public class Substance extends PackEntry{
 	private BigDecimal molecularWeight = new BigDecimal(0); // the molecular weight
 	private BigDecimal density = new BigDecimal(0); // the density
 	
-	private String substanceId = ""; // the name and unique identification string
 	private ArrayList<String> trivialNames = new ArrayList<String>(); // the different (trivial) names of the substance
 	private String displayName = ""; // the name to be displayed // can be substanceId or another trivial name
 	
-	private SubstancePack pack = null; // the substance pack containing this substance
-	
 	// constructor
-	public Substance(String name, BigDecimal molecularWeight, BigDecimal density) {
-		this.substanceId = name;
+/*	public Substance(String name, BigDecimal molecularWeight, BigDecimal density) {
+		this.id = name;
 		this.molecularWeight = molecularWeight;
 		this.density = density;
-		this.displayName = substanceId; // first off display the identifier
+		this.displayName = id; // first off display the identifier
 		if (!SubstanceHandler.addSubstance(this)) { // add the substance to the substance list
-			LoggingHandler.getLog().warning("Substance \"" + this.substanceId + "\" is not unique");
+			LoggingHandler.getLog().warning("Substance \"" + this.id + "\" is not unique");
+		}
+	}
+*/	
+	public Substance(String name, BigDecimal molecularWeight, BigDecimal density, SubstancePack owningFile) {
+		this.id = name;
+		this.molecularWeight = molecularWeight;
+		this.density = density;
+		this.displayName = this.id; // first off display the identifier
+		this.setPack(owningFile);
+		if (!SubstanceHandler.addSubstance(this)) { // add the substance to the substance list
+			LoggingHandler.getLog().warning("Substance \"" + this.id + "\" is not unique");
 		}
 	}
 	
-	public Substance(String name, BigDecimal molecularWeight, BigDecimal density, SubstancePack owningFile) {
-		this.substanceId = name;
-		this.molecularWeight = molecularWeight;
-		this.density = density;
-		this.displayName = substanceId; // first off display the identifier
-		this.setPack(owningFile);
-		if (!SubstanceHandler.addSubstance(this)) { // add the substance to the substance list
-			LoggingHandler.getLog().warning("Substance \"" + this.substanceId + "\" is not unique");
-		}
+	// clones the substance and returns an identical one
+	@Override
+	public Substance clone() {
+		return new Substance(this.id, this.molecularWeight, this.density, (SubstancePack) this.pack);
 	}
 	
 	// adds a (trivial) name
@@ -83,7 +86,7 @@ public class Substance extends PackEntry{
 		if (nameIndex < this.trivialNames.size() && nameIndex >= 0) {
 			this.displayName = this.trivialNames.get(nameIndex);
 		} else {
-			this.displayName = this.substanceId;
+			this.displayName = this.id;
 		}
 	}
 	
@@ -97,10 +100,6 @@ public class Substance extends PackEntry{
 		return density;
 	}
 
-	public String getSubstanceId() {
-		return substanceId;
-	}
-
 	public ArrayList<String> getTrivialNames() {
 		return trivialNames;
 	}
@@ -110,7 +109,7 @@ public class Substance extends PackEntry{
 	}
 	
 	public SubstancePack getPack() {
-		return pack;
+		return (SubstancePack) pack;
 	}
 
 	// setters
@@ -120,10 +119,6 @@ public class Substance extends PackEntry{
 
 	public void setDensity(BigDecimal density) {
 		this.density = density;
-	}
-
-	public void setSubstanceId(String substanceId) {
-		this.substanceId = substanceId;
 	}
 
 	public void setTrivialNames(ArrayList<String> trivialNames) {

@@ -17,8 +17,8 @@ public class SubstanceHandler {
 	public static boolean addSubstance(Substance substance) {
 		if (substance != null && !substances.contains(substance)) {
 			for (Substance item : substances) {
-				if (item.getSubstanceId().equals(substance.getSubstanceId())) {
-					if (!duplicateSubstances.contains(substance)) { // add to duplicate list if not allready present
+				if (item.getId().equals(substance.getId())) {
+					if (!duplicateSubstances.contains(substance)) { // add to duplicate list if not already present
 						duplicateSubstances.add(substance);
 					}
 					return false; // only allow substances with different Id

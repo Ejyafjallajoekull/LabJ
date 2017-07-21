@@ -12,7 +12,7 @@ public class DataIntegrity {
 	public static boolean addSubstance(Substance substance) {
 		if (substance != null && !substances.contains(substance)) {
 			for (Substance item : substances) {
-				if (item.getSubstanceId().equals(substance.getSubstanceId())) {
+				if (item.getId().equals(substance.getId())) {
 					return false; // only allow substances with different Id
 				}
 			}

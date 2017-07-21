@@ -2,10 +2,12 @@ package main;
 
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.math.BigDecimal;
 
 import javax.swing.JFrame;
 
-import functionality.data.SubstanceHandler;
+import functionality.data.Substance;
+import functionality.data.SubstancePack;
 import functionality.housekeeping.logging.LoggingHandler;
 import gui.display.LabJMainFrame;
 
@@ -17,10 +19,10 @@ public class LabJStartingClass {
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		SubstanceHandler.load(new File("sp_test_01.xml"));
-//		SubstancePack sp = new SubstancePack(new File("sp_test_01.xml"));
-//		sp.addSubstance(new Substance("Water", new BigDecimal("0"), new BigDecimal("0")));
-//		sp.save();
+//		SubstanceHandler.load(new File("sp_test_01.xml"));
+		SubstancePack sp = new SubstancePack(new File("sp_test_01.xml"));
+		sp.addEntry(new Substance("Water", new BigDecimal("0.5"), new BigDecimal("0.0"), sp));
+		sp.save();
 		startGUI();
 	}
 	

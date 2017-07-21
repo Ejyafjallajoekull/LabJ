@@ -3,9 +3,16 @@ package functionality.data;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.logging.Level;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -16,6 +23,9 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import functionality.housekeeping.logging.LoggingHandler;
 
@@ -23,28 +33,34 @@ public abstract class Pack {
 // abstract class representing a XML file containing information structured in a LabJ compatible way
 	
 	// fields
-	private ArrayList<PackEntry> entries = new ArrayList<PackEntry>(); // a list of all entries in the pack
-	private File packFile = null; // the XML storing this pack
-	private Document packDoc = null; // the document representing the pack XML
+	protected ArrayList<PackEntry> entries = new ArrayList<PackEntry>(); // a list of all entries in the pack
+	protected File packFile = null; // the XML storing this pack
+	protected Document packDoc = null; // the document representing the pack XML
 	private boolean isLoaded = false; // is the corresponding file loaded?
 	
 	// mimic constants
-	private static String root; // the XML root node
-	private static String node; // the node containing all relevant information
-	private static String[] subProperties; // a list of all properties of a node
+	protected String root; // the XML root node
+	protected String node; // the node containing all relevant information
+	protected String[] subProperties; // a list of all properties of a node
+	protected static final String SUB_ID = "ID"; // the pack unique identifier of a entry
+	protected static final String SUB_COMMENT = "Comment"; // the comment node of a entry
 
 	// constructor
 	public Pack(File file) {
 		if (file != null) {
 			this.packFile = file;
-			this.isLoaded = this.load();
+			// load the XML to the memory
+			if (this.load()) {
+				
+			}
+//			this.isLoaded = this.loadPack();
 		} else {
 			LoggingHandler.getLog().warning("This pack has no corresponding file");
 		}	
 	}
 	
 	// abstract methods
-	public abstract boolean load(); // load data from the XML file
+	public abstract boolean loadPack(); // load data from the XML file
 	
 	// methods
 	// save this pack to XML
@@ -72,6 +88,49 @@ public abstract class Pack {
 		} catch (TransformerConfigurationException | TransformerFactoryConfigurationError e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+	
+	// parse the XML file
+	private boolean load() {
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		try {
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			if (this.packFile.exists() && this.packFile.isFile()) {
+				try {
+					this.packDoc = db.parse(this.packFile);
+					return true; // loading the XML worked
+				} catch (SAXException | IOException e) {
+					LoggingHandler.getLog().log(Level.SEVERE, "Could not load " + this.packFile, e);
+					e.printStackTrace();
+				}
+			} else {
+				this.packDoc = db.newDocument();
+				return true; // at least a document was created
+			}
+		} catch (ParserConfigurationException e) {
+			LoggingHandler.getLog().log(Level.SEVERE, "Could not initialise a DocumentBuilder", e);
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	// methods
+	// add a unique substance
+	public boolean addEntry(PackEntry entry) {
+		if (entry != null && !entries.contains(entry)) {
+			for (PackEntry item : entries) {
+				if (item.getId().equals(entry.getId())) {
+					return false; // only allow substances with different Id
+				}
+			}
+			// clone object and add it to the pack, so there is no problem with references in different packs
+			PackEntry e = entry.clone();
+			e.setPack(this);
+			entries.add(e);
+			return true;
+		} else {
+			return false;
 		}
 	}
 }
