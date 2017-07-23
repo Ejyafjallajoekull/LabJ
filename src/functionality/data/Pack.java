@@ -51,9 +51,8 @@ public abstract class Pack {
 			this.packFile = file;
 			// load the XML to the memory
 			if (this.load()) {
-				
+				this.isLoaded = this.loadPack();
 			}
-//			this.isLoaded = this.loadPack();
 		} else {
 			LoggingHandler.getLog().warning("This pack has no corresponding file");
 		}	

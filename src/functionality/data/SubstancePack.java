@@ -123,7 +123,7 @@ public class SubstancePack extends Pack{
 					
 				}
 				if (subID != null && !subID.isEmpty()) {
-					Substance sub = new Substance(subID, M, d, this);
+					Substance sub = new Substance(subID, names, M, d, this);
 					sub.setTrivialNames(new ArrayList<String>(Arrays.asList(names)));
 					sub.setDisplayName(name);
 					this.addEntry(sub);

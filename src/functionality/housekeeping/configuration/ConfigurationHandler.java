@@ -7,7 +7,7 @@ public class ConfigurationHandler {
 // handles all configuration
 	
 	// constants
-	public static final String VERSION = "0.0.2"; // the version number
+	public static final String VERSION = "0.0.3"; // the version number
 //	private static final String INI_NAME = "LabJ";
 	
 	// fields
