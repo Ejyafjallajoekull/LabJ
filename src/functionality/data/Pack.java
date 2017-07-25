@@ -28,7 +28,7 @@ import org.xml.sax.SAXException;
 import functionality.housekeeping.logging.LoggingHandler;
 
 public abstract class Pack {
-// abstract class representing a XML file containing information structured in a LabJ compatible way
+// abtract class representing a XML file containing information structured in a LabJ compatible way
 	
 	// fields
 	protected ArrayList<PackEntry> entries = new ArrayList<PackEntry>(); // a list of all entries in the pack
