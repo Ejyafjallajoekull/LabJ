@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.AbstractList;
 import java.util.ArrayList;
 
-import functionality.housekeeping.logging.LoggingHandler;
-
 
 public class Substance extends PackEntry{
 // a chemical substance
@@ -20,17 +18,7 @@ public class Substance extends PackEntry{
 	// constants
 	private static final String NO_DISPLAYNAME = "No name defined"; // constant to be displayed, if no names are defined
 	
-	// constructor
-/*	public Substance(String name, BigDecimal molecularWeight, BigDecimal density) {
-		this.id = name;
-		this.molecularWeight = molecularWeight;
-		this.density = density;
-		this.displayName = id; // first off display the identifier
-		if (!SubstanceHandler.addSubstance(this)) { // add the substance to the substance list
-			LoggingHandler.getLog().warning("Substance \"" + this.id + "\" is not unique");
-		}
-	}
-*/	
+	// constructor	
 	public Substance(String id, String[] names, BigDecimal molecularWeight, BigDecimal density, SubstancePack owningFile) {
 		this.id = id;
 		this.molecularWeight = molecularWeight;
@@ -40,9 +28,9 @@ public class Substance extends PackEntry{
 			this.addName(names);
 		}
 		this.setPack(owningFile);
-		if (!SubstanceHandler.addSubstance(this)) { // add the substance to the substance list
+	/*	if (!SubstanceHandler.addSubstance(this)) { // add the substance to the substance list
 			LoggingHandler.getLog().warning("Substance \"" + this.id + "\" is not unique");
-		}
+		}*/
 	}
 	
 	// clones the substance and returns an identical one
@@ -50,7 +38,8 @@ public class Substance extends PackEntry{
 	public Substance clone() {
 		Substance sb = new Substance(this.id, this.trivialNames.toArray(new String[this.trivialNames.size()]), this.molecularWeight, this.density, (SubstancePack) this.pack);
 		sb.setDisplayName(this.getDisplayName());
-		sb.setComment(this.comment);
+		sb.setComments(this.comments);
+		sb.setAttachments(this.attachments);
 		return sb;
 	}
 	
@@ -77,15 +66,15 @@ public class Substance extends PackEntry{
 	}
 	
 	// adds multiple (trivial) names handed over as list
-		public boolean addName(AbstractList<String> names) {
-			boolean add = false; // tracker if a name was actually added
-			for (String name : names) {
-				if (this.addName(name)) {
-					add = true; // if at least one name gets added return true
-				}
+	public boolean addName(AbstractList<String> names) {
+		boolean add = false; // tracker if a name was actually added
+		for (String name : names) {
+			if (this.addName(name)) {
+				add = true; // if at least one name gets added return true
 			}
-			return add;
 		}
+		return add;
+	}
 	
 	// removes the given name if present
 	public boolean removeName(String name) {

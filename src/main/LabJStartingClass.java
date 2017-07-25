@@ -18,12 +18,8 @@ public class LabJStartingClass {
 	private static JFrame mainWindow = null; // the main window
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-//		SubstanceHandler.load(new File("sp_test_01.xml"));
-		SubstancePack sp = new SubstancePack(new File("sp_test_01.xml"));
-		sp.addEntry(new Substance("Water", new BigDecimal("0.5"), new BigDecimal("0.0"), sp));
-		sp.save();
-		startGUI();
+		test();
+	//	startGUI();
 	}
 	
 	// initiates the GUI
@@ -44,6 +40,16 @@ public class LabJStartingClass {
 			mainWindow = null;
 			LoggingHandler.getLog().info("GUI closed.");
 		}
+	}
+	
+	private static void test() {
+//		SubstanceHandler.load(new File("sp_test_01.xml"));
+		SubstancePack sp = new SubstancePack(new File("sp_test_01.xml"));
+		sp.addEntry(new Substance("oewijfjojdl", new String[]{"Hydrogen"}, new BigDecimal("0.5"), new BigDecimal("0.245"), sp));
+		sp.addEntry(new Substance("oewijajojdl", new String[]{"Oxygen"}, new BigDecimal("0.2"), new BigDecimal("0.245"), sp));
+		sp.getEntries().get(0).getComments().add("Hydrogen is cool.");
+		sp.getEntries().get(1).getComments().add("Oxygen is much cooler!");
+		sp.save();
 	}
 
 
