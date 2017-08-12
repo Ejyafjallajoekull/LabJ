@@ -3,13 +3,15 @@ package labjframework.packs;
 import java.util.AbstractList;
 import java.util.ArrayList;
 
+import labjframework.utilities.XMLFormattedText;
+
 public abstract class PackEntry {
 // entry of a XML pack
 
 	protected Pack pack = null; // the substance pack containing this substance
 	protected String id; // the pack unique identification string of the entry
-	protected ArrayList<String> comments = new ArrayList<String>(); // a comment for the entry
-	protected ArrayList<String> attachments = new ArrayList<String>(); // the references to the attachments
+	protected ArrayList<XMLFormattedText> comments = new ArrayList<XMLFormattedText>(); // a comment for the entry
+	protected ArrayList<XMLFormattedText> attachments = new ArrayList<XMLFormattedText>(); // the references to the attachments
 	protected ArrayList<String> trivialNames = new ArrayList<String>(); // the different (trivial) names of the substance
 	protected String displayName = NO_DISPLAYNAME; // the name to be displayed // can be substanceId or another trivial name
 	
@@ -109,8 +111,8 @@ public abstract class PackEntry {
 	}
 	
 	// returns a string reference to this specific XML entry
-	public String getReference() {
-		String ref = this.getPack().getPackFile() + ":";
+	public PackReference getReference() {
+		return new PackReference(this.pack, this.getClass(), this.id, null);
 	}
 	
 	// getters
@@ -118,11 +120,11 @@ public abstract class PackEntry {
 		return pack;
 	}
 	
-	public ArrayList<String> getComments() {
+	public ArrayList<XMLFormattedText> getComments() {
 		return comments;
 	}
 	
-	public ArrayList<String> getAttachments() {
+	public ArrayList<XMLFormattedText> getAttachments() {
 		return attachments;
 	}
 	
@@ -142,11 +144,11 @@ public abstract class PackEntry {
 		this.pack = pack;
 	}
 
-	public void setComments(ArrayList<String> comments) {
+	public void setComments(ArrayList<XMLFormattedText> comments) {
 		this.comments = comments;
 	}
 	
-	public void setAttachments(ArrayList<String> attachments) {
+	public void setAttachments(ArrayList<XMLFormattedText> attachments) {
 		this.attachments = attachments;
 	}
 
