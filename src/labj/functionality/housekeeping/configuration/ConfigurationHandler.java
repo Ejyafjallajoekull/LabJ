@@ -1,4 +1,4 @@
-package functionality.housekeeping.configuration;
+package labj.functionality.housekeeping.configuration;
 
 import java.awt.Color;
 

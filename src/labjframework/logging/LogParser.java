@@ -1,4 +1,4 @@
-package functionality.housekeeping.logging;
+package labjframework.logging;
 
 import java.io.File;
 import java.io.IOException;

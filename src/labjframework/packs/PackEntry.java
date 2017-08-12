@@ -1,46 +1,32 @@
-package functionality.data;
+package labjframework.packs;
 
-import java.math.BigDecimal;
 import java.util.AbstractList;
 import java.util.ArrayList;
 
+public abstract class PackEntry {
+// entry of a XML pack
 
-public class Substance extends PackEntry{
-// a chemical substance
-	
-	// BigDecimal for exact representation of values
-	private BigDecimal molecularWeight = new BigDecimal(0); // the molecular weight
-	private BigDecimal density = new BigDecimal(0); // the density
-	
-	private ArrayList<String> trivialNames = new ArrayList<String>(); // the different (trivial) names of the substance
-	private String displayName = NO_DISPLAYNAME; // the name to be displayed // can be substanceId or another trivial name
+	protected Pack pack = null; // the substance pack containing this substance
+	protected String id; // the pack unique identification string of the entry
+	protected ArrayList<String> comments = new ArrayList<String>(); // a comment for the entry
+	protected ArrayList<String> attachments = new ArrayList<String>(); // the references to the attachments
+	protected ArrayList<String> trivialNames = new ArrayList<String>(); // the different (trivial) names of the substance
+	protected String displayName = NO_DISPLAYNAME; // the name to be displayed // can be substanceId or another trivial name
 	
 	// constants
 	private static final String NO_DISPLAYNAME = "No name defined"; // constant to be displayed, if no names are defined
+
+	public abstract PackEntry clone(); // clone this entry and return an identical one
 	
-	// constructor	
-	public Substance(String id, String[] names, BigDecimal molecularWeight, BigDecimal density, SubstancePack owningFile) {
+	
+	// constructor
+	public PackEntry(String id, String[] names, Pack owningPack) {
 		this.id = id;
-		this.molecularWeight = molecularWeight;
-		this.density = density;
 		if (names.length > 0) {
 			this.displayName = names[0]; // first off display the initial name
 			this.addName(names);
 		}
-		this.setPack(owningFile);
-	/*	if (!SubstanceHandler.addSubstance(this)) { // add the substance to the substance list
-			LoggingHandler.getLog().warning("Substance \"" + this.id + "\" is not unique");
-		}*/
-	}
-	
-	// clones the substance and returns an identical one
-	@Override
-	public Substance clone() {
-		Substance sb = new Substance(this.id, this.trivialNames.toArray(new String[this.trivialNames.size()]), this.molecularWeight, this.density, (SubstancePack) this.pack);
-		sb.setDisplayName(this.getDisplayName());
-		sb.setComments(this.comments);
-		sb.setAttachments(this.attachments);
-		return sb;
+		this.setPack(owningPack);
 	}
 	
 	// adds a (trivial) name
@@ -122,16 +108,28 @@ public class Substance extends PackEntry{
 		this.displayName = this.trivialNames.get(this.trivialNames.indexOf(name));
 	}
 	
-
+	// returns a string reference to this specific XML entry
+	public String getReference() {
+		String ref = this.getPack().getPackFile() + ":";
+	}
+	
 	// getters
-	public BigDecimal getMolecularWeight() {
-		return molecularWeight;
+	public Pack getPack() {
+		return pack;
 	}
-
-	public BigDecimal getDensity() {
-		return density;
+	
+	public ArrayList<String> getComments() {
+		return comments;
 	}
-
+	
+	public ArrayList<String> getAttachments() {
+		return attachments;
+	}
+	
+	public String getId() {
+		return id;
+	}
+	
 	public ArrayList<String> getTrivialNames() {
 		return trivialNames;
 	}
@@ -139,26 +137,25 @@ public class Substance extends PackEntry{
 	public String getDisplayName() {
 		return displayName;
 	}
-	
-	public SubstancePack getPack() {
-		return (SubstancePack) pack;
-	}
-
 	// setters
-	public void setMolecularWeight(BigDecimal molecularWeight) {
-		this.molecularWeight = molecularWeight;
+	public void setPack(Pack pack) {
+		this.pack = pack;
 	}
 
-	public void setDensity(BigDecimal density) {
-		this.density = density;
+	public void setComments(ArrayList<String> comments) {
+		this.comments = comments;
+	}
+	
+	public void setAttachments(ArrayList<String> attachments) {
+		this.attachments = attachments;
 	}
 
+	public void setId(String id) {
+		this.id = id;
+	}
+	
 	public void setTrivialNames(ArrayList<String> trivialNames) {
 		this.trivialNames = trivialNames;
-	}
-
-	public void setPack(SubstancePack pack) {
-		this.pack = pack;
 	}
 
 }

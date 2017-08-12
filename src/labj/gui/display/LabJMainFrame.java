@@ -1,8 +1,8 @@
-package gui.display;
+package labj.gui.display;
 
 import javax.swing.JFrame;
 
-import functionality.housekeeping.configuration.ConfigurationHandler;
+import labj.functionality.housekeeping.configuration.ConfigurationHandler;
 
 public class LabJMainFrame extends JFrame {
 

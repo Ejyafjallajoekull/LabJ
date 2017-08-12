@@ -1,4 +1,4 @@
-package functionality.housekeeping.logging;
+package labjframework.logging;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,7 +11,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import functionality.housekeeping.configuration.ConfigurationHandler;
+import labj.functionality.housekeeping.configuration.ConfigurationHandler;
 
 public class LoggingHandler {
 // centrally handles logging
