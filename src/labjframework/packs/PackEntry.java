@@ -112,7 +112,7 @@ public abstract class PackEntry {
 	
 	// returns a string reference to this specific XML entry
 	public PackReference getReference() {
-		return new PackReference(this.pack, this.getClass(), this.id, null);
+		return new PackReference(this, null);
 	}
 	
 	// getters
