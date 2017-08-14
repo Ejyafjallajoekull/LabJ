@@ -9,7 +9,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -53,7 +55,7 @@ public class XMLFormattedText {
 						LoggingHandler.getLog().log(Level.SEVERE, "DocumentBuilder could not parse \"" + text + "\"", e1);
 						e1.printStackTrace();
 					}
-					e.printStackTrace();
+					//e.printStackTrace();
 				}
 			} catch (ParserConfigurationException e) {
 				LoggingHandler.getLog().log(Level.SEVERE, "Could not initialise a DocumentBuilder", e);
@@ -66,15 +68,20 @@ public class XMLFormattedText {
 		if (node != null) {
 			if (node.getNodeName().equals(FORMATTED_TEXT)) { // is this node really XML formatted text?
 				this.formattedText = node;
-			} else { // if not, create a formatted text parent node
-				try {
-					Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-					Node ft = doc.appendChild(doc.createElement(FORMATTED_TEXT)); // create a new document with formatted text as root
-					ft.appendChild(node);
-					this.formattedText = ft;
-				} catch (ParserConfigurationException e) {
-					LoggingHandler.getLog().log(Level.SEVERE, "Could not initialise a DocumentBuilder", e);
-					e.printStackTrace();
+			} else { // search for formatted text child nodes
+				NodeList nl = ((Element) node).getElementsByTagName(FORMATTED_TEXT);
+				if (nl.getLength() > 0) {
+					this.formattedText = nl.item(0);
+				} else { // if no formatted text is present, create a formatted text parent node
+					try {
+						Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+						Node ft = doc.appendChild(doc.createElement(FORMATTED_TEXT)); // create a new document with formatted text as root
+						ft.appendChild(doc.adoptNode(node));
+						this.formattedText = ft;
+					} catch (ParserConfigurationException e) {
+						LoggingHandler.getLog().log(Level.SEVERE, "Could not initialise a DocumentBuilder", e);
+						e.printStackTrace();
+					}
 				}
 			}
 		}

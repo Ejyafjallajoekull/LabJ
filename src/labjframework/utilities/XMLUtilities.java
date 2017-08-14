@@ -28,7 +28,7 @@ public class XMLUtilities {
 				Transformer trans = TransformerFactory.newInstance().newTransformer();
 				trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes"); // write no XML declaration as header
 				trans.setOutputProperty(OutputKeys.METHOD, "xml"); // write plain text
-				trans.setOutputProperty(OutputKeys.INDENT, "no"); // allow auto whitespace
+				trans.setOutputProperty(OutputKeys.INDENT, Configurations.xmlIndent); // allow auto whitespace
 				trans.setOutputProperty(OutputKeys.ENCODING, Configurations.xmlEncoding); //use UTF-8 as encoding
 				DOMSource source = new DOMSource(node); // set the node as source
 				StreamResult result = new StreamResult(new StringWriter()); // transform it to a stringwriter
@@ -53,7 +53,7 @@ public class XMLUtilities {
 				Transformer trans = TransformerFactory.newInstance().newTransformer();
 				trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes"); // write no XML declaration as header
 				trans.setOutputProperty(OutputKeys.METHOD, "xml"); // write plain text
-				trans.setOutputProperty(OutputKeys.INDENT, "no"); // allow auto whitespace
+				trans.setOutputProperty(OutputKeys.INDENT, Configurations.xmlIndent); // allow auto whitespace
 				trans.setOutputProperty(OutputKeys.ENCODING, Configurations.xmlEncoding); //use UTF-8 as encoding
 				DOMSource source = new DOMSource(doc);
 				StreamResult result = new StreamResult(new StringWriter());

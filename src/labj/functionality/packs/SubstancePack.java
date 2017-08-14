@@ -22,6 +22,7 @@ import org.w3c.dom.NodeList;
 import labjframework.logging.LoggingHandler;
 import labjframework.packs.Pack;
 import labjframework.packs.PackEntry;
+import labjframework.utilities.XMLFormattedText;
 import labjframework.utilities.XMLUtilities;
 
 public class SubstancePack extends Pack{
@@ -47,8 +48,8 @@ public class SubstancePack extends Pack{
 			String subID = ""; // ID
 			BigDecimal M = new BigDecimal(0); // molecular weight
 			BigDecimal d = new BigDecimal(0); // density
-			ArrayList<String> comm = new ArrayList<String>(); // comments
-			ArrayList<String> att = new ArrayList<String>(); // attachments
+			ArrayList<XMLFormattedText> comm = new ArrayList<XMLFormattedText>(); // comments
+			ArrayList<XMLFormattedText> att = new ArrayList<XMLFormattedText>(); // attachments
 			String name = ""; // display name index
 			String[] names = {}; // trivial names
 			for(String prop : SUB_PROPERTIES) { // iterate over all properties of the substance
@@ -69,7 +70,7 @@ public class SubstancePack extends Pack{
 				case SUB_COMMENT:
 					if (propList != null && propList.getLength() > 0) {
 						for (int n = 0; n < propList.getLength(); n++) {
-							comm.add(propList.item(n).getTextContent());
+							comm.add(new XMLFormattedText(propList.item(n)));
 						}
 					} else {
 						LoggingHandler.getLog().info("No instances of " + prop + " detected for subtance " + subID + " in substance pack " + this.packFile);
@@ -79,7 +80,7 @@ public class SubstancePack extends Pack{
 				case SUB_ATTACHMENT:
 					if (propList != null && propList.getLength() > 0) {
 						for (int n = 0; n < propList.getLength(); n++) {
-							att.add(propList.item(n).getTextContent());
+							att.add(new XMLFormattedText(propList.item(n)));
 						}
 					} else {
 						LoggingHandler.getLog().info("No instances of " + prop + " detected for subtance " + subID + " in substance pack " + this.packFile);

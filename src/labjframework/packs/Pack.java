@@ -29,6 +29,7 @@ import org.xml.sax.SAXException;
 
 import labjframework.logging.LoggingHandler;
 import labjframework.utilities.Configurations;
+import labjframework.utilities.XMLFormattedText;
 import labjframework.utilities.XMLUtilities;
 
 public abstract class Pack {
@@ -77,7 +78,7 @@ public abstract class Pack {
 				Transformer trans = TransformerFactory.newInstance().newTransformer();
 				trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no"); // write a XML declaration as header
 				trans.setOutputProperty(OutputKeys.METHOD, "xml"); // write a XML document
-				trans.setOutputProperty(OutputKeys.INDENT, "no"); // allow auto whitespace
+				trans.setOutputProperty(OutputKeys.INDENT, Configurations.xmlIndent); // allow auto whitespace
 				trans.setOutputProperty(OutputKeys.ENCODING, Configurations.xmlEncoding); //use UTF-8 as encoding
 				this.updateDocument();
 				DOMSource source = new DOMSource(this.packDoc);
@@ -198,7 +199,7 @@ public abstract class Pack {
 				Transformer trans = TransformerFactory.newInstance().newTransformer();
 				trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no"); // write a XML declaration as header
 				trans.setOutputProperty(OutputKeys.METHOD, "xml"); // write a XML document
-				trans.setOutputProperty(OutputKeys.INDENT, "no"); // allow auto whitespace
+				trans.setOutputProperty(OutputKeys.INDENT, Configurations.xmlIndent); // allow auto whitespace
 				trans.setOutputProperty(OutputKeys.ENCODING, Configurations.xmlEncoding); //use UTF-8 as encoding
 				DocumentBuilder db;
 				try {
@@ -223,7 +224,7 @@ public abstract class Pack {
 						e1.printStackTrace();
 					}			
 				} catch (ParserConfigurationException e2) {
-					// TODO Auto-generated catch block
+					LoggingHandler.getLog().log(Level.SEVERE, "Could not initialise a DocumentBuilder", e2);
 					e2.printStackTrace();
 				}
 			} catch (TransformerConfigurationException | TransformerFactoryConfigurationError e) {
@@ -266,15 +267,27 @@ public abstract class Pack {
 		}
 		return null;
 	}
+	
+	// get the entry with the specified ID
+	public PackEntry getByID(String id) {
+		if (id != null && !id.isEmpty()) {
+			for (PackEntry entry : this.entries) {
+				if (entry.getId().equals(id)) {
+					return entry;
+				}
+			}
+		}
+		return null;
+	}
 
 	// helper function to shorten code
 	protected void addProperty(Node parentNode, String propertyName, String data) {
 		if (this.packDoc != null && parentNode != null) {
 			Node prop = this.packDoc.createElement(propertyName); // create a new property node with the specified name
 			parentNode.appendChild(prop); // append it to the parent node
-			if (!XMLUtilities.hasXMLContent(data)) { // if the string does not contain XML data, handle it as plain text
-				prop.appendChild(this.packDoc.createTextNode(data)); // add the data as text to the new property node
-			} else {
+	//		if (!XMLUtilities.hasXMLContent(data)) { // if the string does not contain XML data, handle it as plain text
+			prop.appendChild(this.packDoc.createTextNode(data)); // add the data as text to the new property node
+	/*		} else {
 				String[] sepContent = XMLUtilities.separateXMLContent(data); // separate XML content and text
 				for (String content : sepContent) {
 					if (!XMLUtilities.hasXMLContent(content)) {
@@ -295,7 +308,7 @@ public abstract class Pack {
 						}
 					}
 				}
-			}
+			}*/
 		}
 	}
 	
@@ -303,14 +316,14 @@ public abstract class Pack {
 	protected void addProperty(Node parentNode, String propertyName, String[] data) {
 		if (this.packDoc != null && parentNode != null) {
 			Node prop = null;
-			try {
-				DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		//	try {
+		//		DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 				for (String s : data) {
 					prop = this.packDoc.createElement(propertyName); // create a new property node with the specified name
 					parentNode.appendChild(prop); // append it to the parent node
-					if (!XMLUtilities.hasXMLContent(s)) { // if the string does not contain XML data, handle it as plain text
-						prop.appendChild(this.packDoc.createTextNode(s)); // add the data as text to the new property node
-					} else {
+			//		if (!XMLUtilities.hasXMLContent(s)) { // if the string does not contain XML data, handle it as plain text
+					prop.appendChild(this.packDoc.createTextNode(s)); // add the data as text to the new property node
+			/*		} else {
 						String[] sepContent = XMLUtilities.separateXMLContent(s); // separate XML content and text
 						for (String content : sepContent) {
 							if (!XMLUtilities.hasXMLContent(content)) {
@@ -325,11 +338,11 @@ public abstract class Pack {
 								}
 							}
 						}
-					}
+					} 
 				}
 			} catch (ParserConfigurationException e) {
 				LoggingHandler.getLog().log(Level.SEVERE, "Could not initialise a DocumentBuilder", e);
-				e.printStackTrace();
+				e.printStackTrace(); */
 			}
 		}
 	}
@@ -338,33 +351,22 @@ public abstract class Pack {
 	protected void addProperty(Node parentNode, String propertyName, ArrayList<String> data) {
 		if (this.packDoc != null && parentNode != null) {
 			Node prop = null;
-			try {
-				DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-				for (String s : data) {
-					prop = this.packDoc.createElement(propertyName); // create a new property node with the specified name
-					parentNode.appendChild(prop); // append it to the parent node
-					if (!XMLUtilities.hasXMLContent(s)) { // if the string does not contain XML data, handle it as plain text
-						prop.appendChild(this.packDoc.createTextNode(s)); // add the data as text to the new property node
-					} else {
-						String[] sepContent = XMLUtilities.separateXMLContent(s); // separate XML content and text
-						for (String content : sepContent) {
-							if (!XMLUtilities.hasXMLContent(content)) {
-								prop.appendChild(this.packDoc.createTextNode(content)); // if no XML content, add the data as text to the new property node
-							} else {
-								try { // otherwise add it as node to preserve its XML identity (omit replacement of greater & lesser signs, which happens in text node creation)
-									Document insert = db.parse(new InputSource(new ByteArrayInputStream(content.getBytes(Configurations.xmlEncoding))));
-									prop.appendChild(this.packDoc.adoptNode(insert.getDocumentElement())); // add the data as text to the new property node
-								} catch (SAXException | IOException e) { // loading failed
-									LoggingHandler.getLog().log(Level.SEVERE, "Could not create an XML content insert from \"" + content + "\"", e);
-									e.printStackTrace();
-								}
-							}
-						}
-					}
-				}
-			} catch (ParserConfigurationException e) {
-				LoggingHandler.getLog().log(Level.SEVERE, "Could not initialise a DocumentBuilder", e);
-				e.printStackTrace();
+			for (String s : data) {
+				prop = this.packDoc.createElement(propertyName); // create a new property node with the specified name
+				parentNode.appendChild(prop); // append it to the parent node
+				prop.appendChild(this.packDoc.createTextNode(s)); // add the data as text to the new property node
+			}
+		}
+	}
+	
+	// helper function to shorten code
+	protected void addXMLProperty(Node parentNode, String propertyName, ArrayList<XMLFormattedText> data) {
+		if (this.packDoc != null && parentNode != null) {
+			Node prop = null;
+			for (XMLFormattedText s : data) {
+				prop = this.packDoc.createElement(propertyName); // create a new property node with the specified name
+				parentNode.appendChild(prop); // append it to the parent node
+				prop.appendChild(this.packDoc.adoptNode(s.toNode())); // add the data as text to the new property node
 			}
 		}
 	}
@@ -375,9 +377,9 @@ public abstract class Pack {
 			// ID
 			this.addProperty(parentNode, SUB_ID, entry.getId());
 			// comments	
-			this.addProperty(parentNode, SUB_COMMENT, entry.getComments());
+			this.addXMLProperty(parentNode, SUB_COMMENT, entry.getComments());
 			// attachments
-			this.addProperty(parentNode, SUB_ATTACHMENT, entry.getAttachments());
+			this.addXMLProperty(parentNode, SUB_ATTACHMENT, entry.getAttachments());
 			// trivial names
 			this.addProperty(parentNode, SUB_NAME, entry.getTrivialNames());
 			// display name
@@ -402,9 +404,7 @@ public abstract class Pack {
 				// implement unique update behaviour for different packs
 				this.updateCustomProperties(sub, entry);
 				if (iDs.contains(entry.getId())) { // update substance if already existent
-					System.out.println("Before: " + XMLUtilities.asText(packDoc));
 					this.packDoc.getDocumentElement().replaceChild(sub, nodes.item(iDs.indexOf(entry.getId())));
-					System.out.println("Before: " + XMLUtilities.asText(packDoc));
 				} else { // add new substance if not present in the document
 					this.packDoc.getDocumentElement().appendChild(sub);
 				}		

@@ -57,6 +57,19 @@ public abstract class PackHandler {
 		return packsOfType;
 	}
 	
+	// get all loaded packs in the specified file
+	public ArrayList<Pack> getLoadedPacks(File file) {
+		ArrayList<Pack> packsOfFile = new ArrayList<Pack>();
+		if (file != null && file.exists()) {
+			for (Pack loadedPack : this.loadedPacks) {
+				if (loadedPack.getPackFile() == file) {
+					packsOfFile.add(loadedPack);
+				}
+			}
+		}
+		return packsOfFile;
+	}
+	
 	// saves all packs to XMLs // convenience method
 	public void saveAll() {
 		for (Pack pack : this.loadedPacks) {

@@ -13,6 +13,7 @@ import labj.functionality.packs.SubstancePack;
 import labj.gui.display.LabJMainFrame;
 import labjframework.logging.LoggingHandler;
 import labjframework.packs.PackHandler;
+import labjframework.utilities.XMLFormattedText;
 
 public class LabJStartingClass {
 // starting class
@@ -52,12 +53,13 @@ public class LabJStartingClass {
 		ph.loadPack(new File("sp_test_01.xml"));
 //		SubstancePack sp = new SubstancePack(new File("sp_test_01.xml"));
 		SubstancePack sp = (SubstancePack) ph.getLoadedPacks(SubstancePack.class).get(0);
-		sp.addEntry(new Substance("oewijfjojdl", new String[]{"Hydrogen"}, new BigDecimal("0.5"), new BigDecimal("0.245"), sp));
+//		sp.addEntry(new Substance("oewijfjojdl", new String[]{"Hydrogen"}, new BigDecimal("0.5"), new BigDecimal("0.245"), sp));
 //		sp.addEntry(new Substance("oewijajojdl", new String[]{"Oxygen"}, new BigDecimal("0.2"), new BigDecimal("0.245"), sp));
-//		sp.getEntries().get(0).getComments().add("Hydrogen is cool.");
+//		sp.getEntries().get(0).getComments().add(new XMLFormattedText("Hydrogen is cool."));
 //		sp.getEntries().get(0).getComments().add("Oxygen is much <Reference><ReferenceA>coo\nler</ReferenceA><ReferenceB>lala</ReferenceB></Reference>!");
 //		sp.getEntries().get(0).getComments().add("Oxygen is \n a liar.");
 //		sp.getEntries().get(0).getComments().add("Hydrogen is a gas.");
+//		System.out.println(sp.getEntries().get(0).getComments().get(0));
 		sp.save();
 	}
 
