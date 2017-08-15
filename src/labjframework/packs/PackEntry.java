@@ -115,6 +115,11 @@ public abstract class PackEntry {
 		return new PackReference(this, null);
 	}
 	
+	@Override
+	public String toString() {
+		return (this.pack + ":" + this.getClass().getName() + ":" + this.id + ":" + this.displayName);
+	}
+	
 	// getters
 	public Pack getPack() {
 		return pack;

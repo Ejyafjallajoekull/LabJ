@@ -55,7 +55,7 @@ public class XMLFormattedText {
 						LoggingHandler.getLog().log(Level.SEVERE, "DocumentBuilder could not parse \"" + text + "\"", e1);
 						e1.printStackTrace();
 					}
-					//e.printStackTrace();
+					e.printStackTrace();
 				}
 			} catch (ParserConfigurationException e) {
 				LoggingHandler.getLog().log(Level.SEVERE, "Could not initialise a DocumentBuilder", e);
@@ -84,6 +84,17 @@ public class XMLFormattedText {
 					}
 				}
 			}
+		}
+	}
+	
+	public XMLFormattedText() {
+		try {
+			Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+			doc.appendChild(doc.createElement(FORMATTED_TEXT));
+			this.formattedText = doc.getDocumentElement();
+		} catch (ParserConfigurationException e) {
+			LoggingHandler.getLog().log(Level.SEVERE, "Could not initialise a DocumentBuilder", e);
+			e.printStackTrace();
 		}
 	}
 	

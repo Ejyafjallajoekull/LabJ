@@ -12,6 +12,7 @@ public class LabJPackHandler extends PackHandler {
 		if (file != null) {
 			this.loadSubstancePack(file); // load substance file
 			this.loadOrganismPack(file); // load organism file
+			this.loadTaxonomyPack(file);
 			// TODO: load anything else
 		} else {
 			LoggingHandler.getLog().warning("Cannot load a null file");
@@ -36,6 +37,20 @@ public class LabJPackHandler extends PackHandler {
 	public void loadOrganismPack(File file) {
 		if (file != null) {
 			OrganismPack packToAdd = new OrganismPack(file);
+			if (!this.hasPack(packToAdd)) {
+				this.loadedPacks.add(packToAdd);
+			} else {
+				LoggingHandler.getLog().warning("The pack " + packToAdd + " is already loaded.");
+			}
+		} else {
+			LoggingHandler.getLog().warning("Cannot load a null file");
+		}
+	}
+	
+	// loads a taxonomy pack from a XML
+	public void loadTaxonomyPack(File file) {
+		if (file != null) {
+			TaxonomyPack packToAdd = new TaxonomyPack(file);
 			if (!this.hasPack(packToAdd)) {
 				this.loadedPacks.add(packToAdd);
 			} else {

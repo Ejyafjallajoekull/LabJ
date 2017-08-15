@@ -1,6 +1,5 @@
 package labjframework.packs;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -24,13 +23,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import labjframework.logging.LoggingHandler;
 import labjframework.utilities.Configurations;
 import labjframework.utilities.XMLFormattedText;
-import labjframework.utilities.XMLUtilities;
 
 public abstract class Pack {
 // abstract class representing a XML file containing information structured in a LabJ compatible way
@@ -40,6 +37,7 @@ public abstract class Pack {
 
 	protected File packFile = null; // the XML storing this pack
 	protected Document packDoc = null; // the document representing the pack XML
+	protected PackHandler handler = null; // the pack handler for this pack // necessary for references to work
 	private boolean isLoaded = false; // is the corresponding file loaded?
 
 	// mimic constants
@@ -364,12 +362,23 @@ public abstract class Pack {
 		if (this.packDoc != null && parentNode != null) {
 			Node prop = null;
 			for (XMLFormattedText s : data) {
-				prop = this.packDoc.createElement(propertyName); // create a new property node with the specified name
-				parentNode.appendChild(prop); // append it to the parent node
-				prop.appendChild(this.packDoc.adoptNode(s.toNode())); // add the data as text to the new property node
+				if (s != null) {
+					prop = this.packDoc.createElement(propertyName); // create a new property node with the specified name
+					parentNode.appendChild(prop); // append it to the parent node
+					prop.appendChild(this.packDoc.adoptNode(s.toNode())); // add the data as text to the new property node
+				}
 			}
 		}
 	}
+	
+	// helper function to shorten code
+		protected void addXMLProperty(Node parentNode, String propertyName, Node node) {
+			if (this.packDoc != null && parentNode != null && node != null) {
+				Node prop = this.packDoc.createElement(propertyName); // create a new property node with the specified name
+				parentNode.appendChild(prop); // append it to the parent node
+				prop.appendChild(this.packDoc.adoptNode(node)); // add the data as text to the new property node
+			}
+		}
 	
 	// helper function to update the basic components of pack, so all variables present in an entries abstract form
 	protected void updateBasics(Node parentNode, PackEntry entry) {
@@ -411,8 +420,21 @@ public abstract class Pack {
 			}
 		}
 	}
-		
+	
+	@Override
+	public String toString() {
+		return (this.packFile + ":" + this.getClass().getName());
+	}
+	
 	public ArrayList<PackEntry> getEntries() {
 		return entries;
+	}
+
+	public PackHandler getHandler() {
+		return handler;
+	}
+
+	public void setHandler(PackHandler handler) {
+		this.handler = handler;
 	}
 }

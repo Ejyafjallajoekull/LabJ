@@ -1,19 +1,8 @@
 package labj.functionality.packs;
 
 import java.io.File;
-import java.io.StringWriter;
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -23,7 +12,6 @@ import labjframework.logging.LoggingHandler;
 import labjframework.packs.Pack;
 import labjframework.packs.PackEntry;
 import labjframework.utilities.XMLFormattedText;
-import labjframework.utilities.XMLUtilities;
 
 public class SubstancePack extends Pack{
 

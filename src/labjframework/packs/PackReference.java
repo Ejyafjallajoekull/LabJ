@@ -104,7 +104,11 @@ public class PackReference {
 			refChild.appendChild(refValue);
 			ref.appendChild(refChild);
 			// append representation
-			ref.appendChild(this.representation.toNode());
+			if (representation != null) {
+				refChild = doc.createElement(REF_REPRESENTATION);
+				refChild.appendChild(doc.adoptNode(this.representation.toNode()));
+				ref.appendChild(refChild);	
+			}
 			return ref;
 		} catch (ParserConfigurationException e) {
 			LoggingHandler.getLog().log(Level.SEVERE, "Could not initialise a DocumentBuilder", e);
@@ -136,4 +140,16 @@ public class PackReference {
 	public String toString() {
 		return (this.refPack + ":" + this.refClass + ":" + this.refID);
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj != null && obj.getClass().equals(PackReference.class)) {
+			PackReference ref = (PackReference) obj;
+			if (ref.toString().equals(this.toString())) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 }

@@ -2,18 +2,16 @@ package labj.main;
 
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.math.BigDecimal;
 import java.util.logging.Level;
 
 import javax.swing.JFrame;
 
 import labj.functionality.packs.LabJPackHandler;
-import labj.functionality.packs.Substance;
 import labj.functionality.packs.SubstancePack;
+import labj.functionality.packs.TaxonomyPack;
 import labj.gui.display.LabJMainFrame;
 import labjframework.logging.LoggingHandler;
 import labjframework.packs.PackHandler;
-import labjframework.utilities.XMLFormattedText;
 
 public class LabJStartingClass {
 // starting class
@@ -22,8 +20,8 @@ public class LabJStartingClass {
 	private static JFrame mainWindow = null; // the main window
 	
 	public static void main(String[] args) {
-		test();
-	//	startGUI();
+	//	test();
+		startGUI();
 	}
 	
 	// initiates the GUI
@@ -53,14 +51,37 @@ public class LabJStartingClass {
 		ph.loadPack(new File("sp_test_01.xml"));
 //		SubstancePack sp = new SubstancePack(new File("sp_test_01.xml"));
 		SubstancePack sp = (SubstancePack) ph.getLoadedPacks(SubstancePack.class).get(0);
+		sp.setHandler(ph); // handler necessary for references to work
+		TaxonomyPack tp = (TaxonomyPack) ph.getLoadedPacks(TaxonomyPack.class).get(0);
+//		System.out.println(tp.getEntries().get(0));
+//		for (Taxonomy child : ((Taxonomy) tp.getEntries().get(0)).getChildTaxa(ph)) {
+//			System.out.println(child);
+//		}
+//		tp.addEntry(new Taxonomy("life", new String[]{"Life"}, (Taxonomy) null, tp));
+//		for (int i = 0; i < 10000; i++) {
+//			tp.addEntry(new Taxonomy(String.valueOf(i), new String[]{"Procaryotes"}, (Taxonomy) tp.getEntries().get(0), tp));
+//
+//		}
+//		tp.addEntry(new Taxonomy("viruses", new String[]{"Viruses"}, (Taxonomy) tp.getEntries().get(0), tp));
+//		tp.addEntry(new Taxonomy("escherichia", new String[]{"Escherichia"}, (Taxonomy) tp.getEntries().get(1), tp));
+//		XMLFormattedText com = sp.getEntries().get(0).getComments().get(0);
+//		NodeList nl = ((Element) com.toNode()).getElementsByTagName(PackReference.REFERENCE);
+//		PackReference ref = new PackReference(nl.item(0));
+//		System.out.println(ref.findReference(ph));
 //		sp.addEntry(new Substance("oewijfjojdl", new String[]{"Hydrogen"}, new BigDecimal("0.5"), new BigDecimal("0.245"), sp));
 //		sp.addEntry(new Substance("oewijajojdl", new String[]{"Oxygen"}, new BigDecimal("0.2"), new BigDecimal("0.245"), sp));
 //		sp.getEntries().get(0).getComments().add(new XMLFormattedText("Hydrogen is cool."));
-//		sp.getEntries().get(0).getComments().add("Oxygen is much <Reference><ReferenceA>coo\nler</ReferenceA><ReferenceB>lala</ReferenceB></Reference>!");
+//		XMLFormattedText cool = new XMLFormattedText("cooler");
+//		PackReference ref = new PackReference(sp.getEntries().get(0), cool);
+//		XMLFormattedText com = new XMLFormattedText();
+//		System.out.println();
+//		com.toNode().appendChild(com.toNode().getOwnerDocument().adoptNode(ref.toNode()));
+//		sp.getEntries().get(0).getComments().add(com);
 //		sp.getEntries().get(0).getComments().add("Oxygen is \n a liar.");
 //		sp.getEntries().get(0).getComments().add("Hydrogen is a gas.");
-//		System.out.println(sp.getEntries().get(0).getComments().get(0));
+//		System.out.println(sp.getEntries().get(0).getComments().get(0).toNode().getTextContent());
 		sp.save();
+		tp.save();
 	}
 
 

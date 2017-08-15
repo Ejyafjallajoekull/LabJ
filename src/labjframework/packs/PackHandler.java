@@ -62,7 +62,7 @@ public abstract class PackHandler {
 		ArrayList<Pack> packsOfFile = new ArrayList<Pack>();
 		if (file != null && file.exists()) {
 			for (Pack loadedPack : this.loadedPacks) {
-				if (loadedPack.getPackFile() == file) {
+				if (loadedPack.getPackFile().equals(file)) {
 					packsOfFile.add(loadedPack);
 				}
 			}
