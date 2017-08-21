@@ -74,7 +74,9 @@ public class LabJMainFrame extends JFrame {
 	}
 	
 	public void managePacks() {
-		new PackManagerDialog(this);
+		for (File file : (new PackManagerDialog(this)).getPackFolderFiles()) {
+			System.out.println(file);
+		}
 	}
 	
 	public boolean openFile() {
@@ -84,7 +86,12 @@ public class LabJMainFrame extends JFrame {
 		ff = new FileNameExtensionFilter("LabJ Project", LabJProject.FILE_EXTENSION);
 		fc.addChoosableFileFilter(ff);
 		fc.setFileFilter(ff);
-		fc.showOpenDialog(this);
+		fc.setCurrentDirectory(new File("."));
+		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+			File fileToLoad = fc.getSelectedFile();
+			this.mainProject = new LabJProject(fileToLoad);
+			this.mainProject.load();
+		}
 		return false;
 	}
 	

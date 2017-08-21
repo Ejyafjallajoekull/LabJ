@@ -1,6 +1,9 @@
 package labj.functionality.housekeeping.configuration;
 
 import java.awt.Color;
+import java.io.File;
+
+import labjframework.logging.LoggingHandler;
 
 
 public class ConfigurationHandler {
@@ -11,6 +14,7 @@ public class ConfigurationHandler {
 //	private static final String INI_NAME = "LabJ";
 	
 	// fields
+	private static File packFolder = new File("Packs");
 	private static int mainWindowWidth = 1000; // width of the main window
 	private static int mainWindowHeigth = 700; // heigth of the main window
 	private static int logWindowWidth = 600; // width of the main window
@@ -86,5 +90,19 @@ public class ConfigurationHandler {
 	}
 	public static void setLogExceptionColour(Color logExceptionColour) {
 		ConfigurationHandler.logExceptionColour = logExceptionColour;
+	}
+	public static File getPackFolder() {
+		return packFolder;
+	}
+	public static void setPackFolder(File packFolder) {
+		if (packFolder != null) {
+			if (!packFolder.isFile()) {
+				ConfigurationHandler.packFolder = packFolder;
+			} else {
+				LoggingHandler.getLog().warning("File \"" + packFolder + "\" cannot be set as pack folder");
+			}
+		} else {
+			ConfigurationHandler.packFolder = packFolder;
+		}
 	}
 }

@@ -18,7 +18,7 @@ import org.w3c.dom.Node;
 
 import labjframework.logging.LoggingHandler;
 
-public class XMLUtilities {
+public final class XMLUtilities {
 	
 
 	// returns the string representation of a node and all its children

@@ -7,7 +7,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -15,6 +14,7 @@ import java.util.logging.Level;
 
 import labjframework.logging.LoggingHandler;
 import labjframework.packs.Pack;
+import labjframework.utilities.ByteUtilities;
 
 public class LabJProject {
 // a project file holding all informations on the current session
@@ -67,13 +67,21 @@ public class LabJProject {
 	public boolean load() {
 		if (this.projectFile != null && this.projectFile.isFile()) {
 			try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(this.projectFile))) {
-				byte[] header = new byte[HEADER.getBytes(this.stringEncoding).length];
-				bis.read(header);
-				if (HEADER.equals(new String(header, this.stringEncoding))) {
-					
-				}
-				if () {
-					
+				if (bis.available() >= HEADER.getBytes(this.stringEncoding).length + VERSION.length) { // read file only if enough bytes for header and version byte
+					if (HEADER.equals(ByteUtilities.readString(bis, HEADER.getBytes(this.stringEncoding).length, this.stringEncoding))) { // only proceed if indeed a project file
+						bis.skip(VERSION.length); // skip version byte
+						if (bis.available() >= Integer.BYTES) { // check whether an int can actually be called
+							int packNumber = ByteUtilities.readInteger(bis);
+							for (int i = 0; i < packNumber; i++) {
+								this.loadPack(ByteUtilities.readString(bis, ByteUtilities.readInteger(bis), this.stringEncoding), ByteUtilities.readString(bis, ByteUtilities.readInteger(bis), this.stringEncoding));
+							}
+						}
+						return true;
+					}  else {
+						LoggingHandler.getLog().warning("The file " + this.projectFile + " is not a project file: missing header");
+					}
+				} else {
+					LoggingHandler.getLog().warning("The file " + this.projectFile + " is not a project file: not enough bytes for header");
 				}
 			} catch (FileNotFoundException e) {
 				LoggingHandler.getLog().log(Level.SEVERE, "Project file " + this.projectFile + " not found", e);
@@ -98,11 +106,11 @@ public class LabJProject {
 			try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(this.projectFile))) { // auto close writer
 				bos.write(HEADER.getBytes(this.stringEncoding));
 				bos.write(VERSION);
-				bos.write(ByteBuffer.allocate(Integer.BYTES).putInt(this.projectPacks.size()).array());
+				bos.write(ByteUtilities.integerToByte(this.projectPacks.size()));
 				for (Pack pack : this.projectPacks) { // save packs as combination of pack class and pack file
-					bos.write(ByteBuffer.allocate(Integer.BYTES).putInt(pack.getClass().getName().length()).array());
+					bos.write(ByteUtilities.stringLengthToByte(pack.getClass().getName(), this.stringEncoding));
 					bos.write(pack.getClass().getName().getBytes(this.stringEncoding));
-					bos.write(ByteBuffer.allocate(Integer.BYTES).putInt(pack.getPackFile().getName().length()).array());
+					bos.write(ByteUtilities.stringLengthToByte(pack.getPackFile().getName(), this.stringEncoding));
 					bos.write(pack.getPackFile().getName().getBytes(this.stringEncoding));
 				}
 				LoggingHandler.getLog().info("Project saved to " + this.projectFile);
@@ -122,6 +130,24 @@ public class LabJProject {
 			return this.save();
 		}
 		return false;
+	}
+	
+	
+	private void loadPack(String className, String fileName) {
+		System.out.println(className + "::" + fileName);
+		try {
+			@SuppressWarnings("unchecked")
+			Class<? extends Pack> pack = (Class<? extends Pack>) Class.forName(className);
+			try {
+				pack.getConstructor(File.class);
+			} catch (NoSuchMethodException | SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (ClassNotFoundException e) {
+			LoggingHandler.getLog().log(Level.WARNING, "Class \"" + className + "\" not found", e);
+			e.printStackTrace();
+		}
 	}
 	
 }
