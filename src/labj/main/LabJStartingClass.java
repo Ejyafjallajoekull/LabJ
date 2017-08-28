@@ -8,6 +8,7 @@ import javax.swing.JFrame;
 
 import labj.functionality.packs.LabJPackHandler;
 import labj.functionality.packs.SubstancePack;
+import labj.functionality.packs.Taxonomy;
 import labj.functionality.packs.TaxonomyPack;
 import labj.gui.display.LabJMainFrame;
 import labjframework.logging.LoggingHandler;
@@ -20,7 +21,7 @@ public class LabJStartingClass {
 	private static JFrame mainWindow = null; // the main window
 	
 	public static void main(String[] args) {
-	//	test();
+//		test();
 		startGUI();
 	}
 	
@@ -62,8 +63,10 @@ public class LabJStartingClass {
 //			tp.addEntry(new Taxonomy(String.valueOf(i), new String[]{"Procaryotes"}, (Taxonomy) tp.getEntries().get(0), tp));
 //
 //		}
-//		tp.addEntry(new Taxonomy("viruses", new String[]{"Viruses"}, (Taxonomy) tp.getEntries().get(0), tp));
-//		tp.addEntry(new Taxonomy("escherichia", new String[]{"Escherichia"}, (Taxonomy) tp.getEntries().get(1), tp));
+		tp.addEntry(new Taxonomy("life", new String[]{"Life"},(Taxonomy) null, tp));
+		tp.addEntry(new Taxonomy("procaryotes", new String[]{"Procaryotes"}, (Taxonomy) tp.getEntries().get(0), tp));
+		tp.addEntry(new Taxonomy("viruses", new String[]{"Viruses"}, (Taxonomy) tp.getEntries().get(0), tp));
+		tp.addEntry(new Taxonomy("escherichia", new String[]{"Escherichia"}, (Taxonomy) tp.getEntries().get(1), tp));
 //		XMLFormattedText com = sp.getEntries().get(0).getComments().get(0);
 //		NodeList nl = ((Element) com.toNode()).getElementsByTagName(PackReference.REFERENCE);
 //		PackReference ref = new PackReference(nl.item(0));

@@ -1,6 +1,8 @@
 package labjframework.utilities;
 
+import java.io.File;
 import java.io.StringWriter;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
@@ -169,5 +171,16 @@ public final class XMLUtilities {
 			indices[i] = indexList.get(i);
 		}
 		return indices;
+	}
+	
+	// helper function to get all XML pack files
+	public static boolean isXMLFile(Path path) {
+		if (path != null) {
+			File file = path.toFile();
+			if (file != null && file.isFile()) {
+				return file.getName().toLowerCase().endsWith(".xml");
+			}
+		}
+		return false;
 	}
 }

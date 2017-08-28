@@ -10,13 +10,13 @@ import org.w3c.dom.NodeList;
 import labjframework.logging.LoggingHandler;
 import labjframework.packs.Pack;
 import labjframework.packs.PackEntry;
+import labjframework.packs.PackReference;
+import labjframework.utilities.XMLFormattedText;
 
 public class OrganismPack extends Pack {
 	
 	// constants
 	public static final String ORGANISM = "Organsim"; // the node name
-	public static final String SUB_NAME = "Name"; // identifier for name properties
-	public static final String SUB_DISPLAY = "DisplayName"; // identifier for name to display
 	public static final String SUB_TAXONOMY = "Taxonomy"; // identifier for taxonomy properties
 	private static final String[] SUB_PROPERTIES = {SUB_ID, SUB_ATTACHMENT, SUB_COMMENT, SUB_NAME, SUB_DISPLAY, SUB_TAXONOMY}; // a list of all properties of a substance
 
@@ -28,10 +28,10 @@ public class OrganismPack extends Pack {
 	@Override
 	public boolean loadEntry(Element entry) {
 		if (entry != null) {
-			String subID = ""; // ID
-			ArrayList<String> tax = new ArrayList<String>(); // taxonomy
-			ArrayList<String> comm = new ArrayList<String>(); // comments
-			ArrayList<String> att = new ArrayList<String>(); // attachments
+			String orgID = ""; // ID
+			PackReference taxonomy = null; // taxonomy of this organism
+			ArrayList<XMLFormattedText> comm = new ArrayList<XMLFormattedText>(); // comments
+			ArrayList<XMLFormattedText> att = new ArrayList<XMLFormattedText>(); // attachments
 			String name = ""; // display name index
 			String[] names = {}; // trivial names
 			for(String prop : SUB_PROPERTIES) { // iterate over all properties of the substance
@@ -43,7 +43,7 @@ public class OrganismPack extends Pack {
 						if (propList.getLength() > 1) {
 							LoggingHandler.getLog().warning("Multiple IDs detected for subtance " + propList.item(0).getTextContent() + " in substance pack " + this.packFile);
 						}
-						subID = propList.item(0).getTextContent(); // take the first item
+						orgID = propList.item(0).getTextContent(); // take the first item
 					} else {
 						LoggingHandler.getLog().severe("No ID detected for a subtance in substance pack " + this.packFile);
 					}
@@ -52,20 +52,31 @@ public class OrganismPack extends Pack {
 				case SUB_COMMENT:
 					if (propList != null && propList.getLength() > 0) {
 						for (int n = 0; n < propList.getLength(); n++) {
-							comm.add(propList.item(n).getTextContent());
+							comm.add(new XMLFormattedText(propList.item(n)));
 						}
 					} else {
-						LoggingHandler.getLog().info("No instances of " + prop + " detected for subtance " + subID + " in substance pack " + this.packFile);
+						LoggingHandler.getLog().info("No instances of " + prop + " detected for subtance " + orgID + " in substance pack " + this.packFile);
 					}
 					break;
 					
 				case SUB_ATTACHMENT:
 					if (propList != null && propList.getLength() > 0) {
 						for (int n = 0; n < propList.getLength(); n++) {
-							att.add(propList.item(n).getTextContent());
+							att.add(new XMLFormattedText(propList.item(n)));
 						}
 					} else {
-						LoggingHandler.getLog().info("No instances of " + prop + " detected for subtance " + subID + " in substance pack " + this.packFile);
+						LoggingHandler.getLog().info("No instances of " + prop + " detected for subtance " + orgID + " in substance pack " + this.packFile);
+					}
+					break;
+					
+				case SUB_TAXONOMY:
+					if (propList != null && propList.getLength() > 0) {
+						if (propList.getLength() > 1) {
+							LoggingHandler.getLog().warning("Multiple instances of " + prop + " detected for subtance " + orgID + " in substance pack " + this.packFile);
+						}
+						taxonomy = new PackReference(propList.item(0)); // take the first item
+					} else {
+						LoggingHandler.getLog().info("No instances of " + prop + " detected for subtance " + orgID + " in substance pack " + this.packFile);
 					}
 					break;
 					
@@ -76,44 +87,34 @@ public class OrganismPack extends Pack {
 							names[n] = propList.item(n).getTextContent();
 						}
 					} else {
-						LoggingHandler.getLog().info("No instances of " + prop + " detected for subtance " + subID + " in substance pack " + this.packFile);
+						LoggingHandler.getLog().info("No instances of " + prop + " detected for subtance " + orgID + " in substance pack " + this.packFile);
 					}
 					break;
 					
 				case SUB_DISPLAY:
 					if (propList != null && propList.getLength() > 0) {
 						if (propList.getLength() > 1) {
-							LoggingHandler.getLog().warning("Multiple instances of " + prop + " detected for subtance " + subID + " in substance pack " + this.packFile);
+							LoggingHandler.getLog().warning("Multiple instances of " + prop + " detected for subtance " + orgID + " in substance pack " + this.packFile);
 						}
 						name = propList.item(0).getTextContent(); // take the first item
 					} else {
-						LoggingHandler.getLog().info("No instances of " + prop + " detected for subtance " + subID + " in substance pack " + this.packFile);
-					}
-					break;
-					
-				case SUB_TAXONOMY:
-					if (propList != null && propList.getLength() > 0) {
-						for (int n = 0; n < propList.getLength(); n++) {
-							tax.add(propList.item(n).getTextContent());
-						}
-					} else {
-						LoggingHandler.getLog().info("No instances of " + prop + " detected for subtance " + subID + " in substance pack " + this.packFile);
+						LoggingHandler.getLog().info("No instances of " + prop + " detected for subtance " + orgID + " in substance pack " + this.packFile);
 					}
 					break;
 					
 				default:
-					LoggingHandler.getLog().warning("Detected unknown property " + prop + "for subtance " + subID + " in substance pack " + this.packFile);
+					LoggingHandler.getLog().warning("Detected unknown property " + prop + "for subtance " + orgID + " in substance pack " + this.packFile);
 					break; // do nothing
 				}
 				
 			}
-			if (subID != null && !subID.isEmpty()) { // confirm valid ID
-				Organism org = new Organism(subID, names, this);
-				org.setTaxonomy(tax);
+			if (orgID != null && !orgID.isEmpty()) { // confirm valid ID
+				Organism org = new Organism(orgID, names, taxonomy, this);
 				org.setComments(comm);
 				org.setAttachments(att);
 				org.setDisplayName(name);
 				this.addEntry(org);
+				LoggingHandler.getLog().fine("Taxonomy " + orgID + ":" + name + " was loaded from TaxonomyPack " + this.getPackFile());
 			}
 		}
 		return false;
@@ -121,8 +122,11 @@ public class OrganismPack extends Pack {
 
 	@Override
 	public void updateCustomProperties(Node parentNode, PackEntry entry) {
-		// TODO Auto-generated method stub
-		
+		if (this.packDoc != null && entry != null && parentNode != null) {
+			Organism organism = (Organism) entry;
+			// taxonomy
+			this.addXMLProperty(parentNode, SUB_TAXONOMY, organism.getTaxonomyReference().toNode());
+		}	
 	}
 
 }

@@ -1,4 +1,4 @@
-package labj.gui.display;
+package labj.gui.display.manage;
 
 import java.awt.Dialog;
 import java.awt.Frame;
@@ -18,6 +18,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import labj.functionality.housekeeping.configuration.ConfigurationHandler;
 import labjframework.logging.LoggingHandler;
+import labjframework.utilities.XMLUtilities;
 
 public class PackManagerDialog extends JDialog {
 
@@ -38,30 +39,43 @@ public class PackManagerDialog extends JDialog {
 		this.setSize(600, 700);
 		this.setLocationRelativeTo(null);
 		DefaultMutableTreeNode packFolder = new DefaultMutableTreeNode(ConfigurationHandler.getPackFolder());
-		JTree fileTree = new JTree(packFolder);
+		JTree fileTree = new PackTree(packFolder);
 		for (File file : getPackFolderFiles()) {
 			packFolder.add(new DefaultMutableTreeNode(file));
 		}
+		fileTree.expandRow(0); // initially expand first row to show all available packs
 		JScrollPane scrollPane = new JScrollPane(fileTree);
 		this.add(scrollPane);
 		this.setVisible(true);
 	}
 	
-	public ArrayList<File> getPackFolderFiles() {
-		File packFolder = ConfigurationHandler.getPackFolder();
+	public static ArrayList<File> getPackFolderFiles() {
+		return getPackFiles(ConfigurationHandler.getPackFolder(), false);
+	}
+	
+	public static ArrayList<File> getPackFiles(File folder, boolean recursive) {
 		ArrayList<File> files = new ArrayList<File>();
-		if (packFolder != null) {
-			if (packFolder.isDirectory()) { // will return false if not existent
+		if (folder != null) {
+			if (folder.isDirectory()) { // will return false if not existent
 				// create and autoclose recursive stream of xml files
-				 try (Stream<Path> xmlPaths = Files.find(packFolder.toPath(), MAX_SEARCH_DEPTH_PACK_FOLDER, (filePath, fileAttr) -> isXMLFile(filePath))) {
-					xmlPaths.forEach(path -> files.add(path.toFile()));
-				 } catch (IOException e) {
-					LoggingHandler.getLog().log(Level.SEVERE, "Could not get pack files in folder " + packFolder, e);
-					e.printStackTrace();
+				if (recursive) {
+					try (Stream<Path> xmlPaths = Files.find(folder.toPath(), MAX_SEARCH_DEPTH_PACK_FOLDER, (filePath, fileAttr) -> XMLUtilities.isXMLFile(filePath))) {
+						xmlPaths.forEach(path -> files.add(path.toFile()));
+					} catch (IOException e) {
+						LoggingHandler.getLog().log(Level.SEVERE, "Could not get pack files in folder " + folder, e);
+						e.printStackTrace();
+					}
+				} else { // if non recursive search is required just list all xml files and add them to the list
+					for (File file : folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".xml"))) {
+						if (file != null && file.isFile() && !files.contains(file)) {
+							files.add(file);
+						}
+					}
+					
 				}
 			} else { // can never be a file so no check needed
-				packFolder.mkdirs(); // create folder if not existent
-				LoggingHandler.getLog().info("Pack folder \"" + packFolder + "\" does not exist and will be created.");
+				folder.mkdirs(); // create folder if not existent
+				LoggingHandler.getLog().info("Pack folder \"" + folder + "\" does not exist and will be created.");
 			}
 		}
 		return files;
@@ -75,17 +89,6 @@ public class PackManagerDialog extends JDialog {
 	public PackManagerDialog(Window owner) {
 		super(owner);
 		// TODO Auto-generated constructor stub
-	}
-	
-	// helper function to get all XML pack files
-	private static boolean isXMLFile(Path path) {
-		if (path != null) {
-			File file = path.toFile();
-			if (file != null && file.isFile()) {
-				return file.getName().toLowerCase().endsWith(".xml");
-			}
-		}
-		return false;
 	}
 
 

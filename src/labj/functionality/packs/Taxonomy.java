@@ -29,17 +29,8 @@ public class Taxonomy extends PackEntry {
 		tax.setAttachments(this.attachments);
 		tax.setComments(this.comments);
 		tax.setDisplayName(this.displayName);
-	//	tax.setChildTaxaReferences(this.childTaxa);
 		return tax;
 	}
-
-//	public ArrayList<PackReference> getChildTaxaReferences() {
-//		return this.childTaxa;
-//	}
-
-//	public void setChildTaxaReferences(ArrayList<PackReference> childTaxa) {
-//		this.childTaxa = childTaxa;
-//	}
 	
 	public ArrayList<Taxonomy> getChildTaxa(PackHandler handler) {
 		ArrayList<Taxonomy> children = new ArrayList<Taxonomy>();
@@ -81,7 +72,10 @@ public class Taxonomy extends PackEntry {
 	}
 
 	public Taxonomy getParentTaxon(PackHandler handler) {
-		return (Taxonomy) this.parentTaxon.findReference(handler);
+		if (this.parentTaxon != null) {
+			return (Taxonomy) this.parentTaxon.findReference(handler);
+		}
+		return null;
 	}
 
 	public void setParentTaxonReference(PackReference parentTaxon) {

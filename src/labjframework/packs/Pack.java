@@ -177,9 +177,12 @@ public abstract class Pack {
 	}
 	
 	// is the given Pack equal to this one?
-	public boolean isEqual(Pack eqPack) {
-		if (eqPack.getClass() == this.getClass()) { // only do this if packs of a similar type are compared
-			return eqPack.getPackFile().equals(this.packDoc);
+	@Override
+	public boolean equals(Object obj) {
+		if (obj.getClass() == this.getClass()) { // only do this if packs of a similar type are compared
+			if (this.packFile.equals(((Pack) obj).packFile)  && this.packDoc.equals(((Pack) obj).packDoc) && this.entries.equals(((Pack) obj).entries)) {
+				return true;
+			}
 		}
 		return false;
 	}
@@ -419,6 +422,57 @@ public abstract class Pack {
 				}		
 			}
 		}
+	}
+	
+	// get all dependencies of this specific pack derived from its' references
+	public ArrayList<String> getDependencies() {
+		ArrayList<String> dep = new ArrayList<String>(); // all dependencies of a pack derived from all its' references
+		if (this.packDoc != null) {
+			String refPack = null;
+			NodeList nl = this.packDoc.getElementsByTagName(PackReference.REF_PACK);
+			for (int i = 0; i < nl.getLength(); i++) {
+				refPack = nl.item(i).getTextContent();
+				if (!dep.contains(refPack)) {
+					dep.add(refPack);
+				}
+			}
+		}
+		return dep;
+	}
+	
+	public boolean replaceDependency(String oldDependency, String newDependency) {
+		if (oldDependency != null && newDependency != null && this.packDoc != null) {
+			if (getDependencies().contains(oldDependency)) {
+				// get all referenced pack nodes
+				NodeList nl = this.packDoc.getElementsByTagName(PackReference.REF_PACK);
+				for (int i = 0; i < nl.getLength(); i++) {
+					// if the text node holds the old dependency, replace it with the new one
+					if (nl.item(i).getTextContent().equals(oldDependency)) {
+						nl.item(i).setTextContent(newDependency);
+					}
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	// removes all reference causing the given dependency; should be used with care, as it may break referencing
+	public boolean removeDependency(String dependency) {
+		if (dependency != null && this.packDoc != null && getDependencies().contains(dependency)) {
+			// get all referenced pack nodes
+			NodeList nl = this.packDoc.getElementsByTagName(PackReference.REF_PACK);
+			for (int i = 0; i < nl.getLength(); i++) {
+				// if the text node holds the old dependency, replace it with the new one
+				if (nl.item(i) != null && nl.item(i).getTextContent().equals(dependency)) {
+					this.packDoc.removeChild(nl.item(i).getParentNode()); // remove the reference holding this dependency from the document 
+//					Node ref = nl.item(i).getParentNode();
+//					ref.getParentNode().removeChild(ref); // remove the reference from this document
+				}
+			}
+			return true;
+		}
+		return false;
 	}
 	
 	@Override

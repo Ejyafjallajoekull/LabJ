@@ -1,7 +1,12 @@
 package labjframework.packs;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+
+import labjframework.logging.LoggingHandler;
 
 public abstract class PackHandler {
 // keeps track of loaded packs
@@ -10,34 +15,12 @@ public abstract class PackHandler {
 	protected ArrayList<Pack> loadedPacks = new ArrayList<Pack>(); // list of all loaded packs
 	
 	
-/*	public static boolean addSubstance(Substance substance) {
-		if (substance != null && !substances.contains(substance)) {
-			for (Substance item : substances) {
-				if (item.getId().equals(substance.getId())) {
-					if (!duplicateSubstances.contains(substance)) { // add to duplicate list if not already present
-						duplicateSubstances.add(substance);
-					}
-					return false; // only allow substances with different Id
-				}
-			}
-			substances.add(substance);
-			return true;
-		} else {
-			return false;
-		}
-	}*/
-	
 	// loads all possible entries from a XML
-	public abstract void loadPack(File file);
+	public abstract void loadPacks(File file);
 	
 	// whether the handler has this pack loaded or not
 	public boolean hasPack(Pack pack) {
-		for (Pack loadedPack : this.loadedPacks) {
-			if (loadedPack.equals(pack)) {
-				return true;
-			}
-		}
-		return false;
+		return this.loadedPacks.contains(pack);
 	}
 	
 	public ArrayList<Pack> getLoadedPacks() {
@@ -71,11 +54,65 @@ public abstract class PackHandler {
 	}
 	
 	// saves all packs to XMLs // convenience method
-	public void saveAll() {
+	public void saveAllPacks() {
 		for (Pack pack : this.loadedPacks) {
 			if (pack != null) { // failsafe check
 				pack.save();
 			}
 		}
 	}
+	
+	public boolean addPack(Pack pack) {
+		if (pack != null && !this.loadedPacks.contains(pack)) {
+			return this.loadedPacks.add(pack);
+		}
+		return false;
+	}
+	
+	public boolean removePack(Pack pack) {
+		if (pack != null) {
+			return this.loadedPacks.remove(pack);
+		}
+		return false;
+	}
+	
+	public void unloadAll() {
+		this.loadedPacks.clear();
+		LoggingHandler.getLog().finest("All packs have been unloaded");
+	}
+	
+	// load a specific pack from a pack file
+	public boolean loadPack(File file, Class<? extends Pack> packClass) {
+		if (file != null && packClass != null) {
+			try {
+				Constructor<? extends Pack> packConstructor = packClass.getConstructor(File.class);
+				try {
+					this.loadedPacks.add(packConstructor.newInstance(file)); // add a instance of this pack to the list of loaded packs
+					LoggingHandler.getLog().fine(packClass.getName() + " loaded from " + file);
+					return true;
+				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+						| InvocationTargetException e) {
+					LoggingHandler.getLog().log(Level.SEVERE, "Dynamic pack creation failed for " + file + "::" + packClass.getName(), e);
+					e.printStackTrace();
+				}
+			} catch (NoSuchMethodException | SecurityException e) {
+				LoggingHandler.getLog().log(Level.SEVERE, "Dynamic pack creation failed for " + file + "::" + packClass.getName(), e);
+				e.printStackTrace();
+			}
+		}
+		return false;
+	}
+	
+	public boolean loadPack(File file, String className) {
+		try {
+			@SuppressWarnings("unchecked")
+			Class<? extends Pack> packClass = (Class<? extends Pack>) Class.forName(className);
+			return loadPack(file, packClass);
+		} catch (ClassNotFoundException e) {
+			LoggingHandler.getLog().log(Level.SEVERE, "Dynamic pack creation failed for " + file + "::" + className, e);
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
 }

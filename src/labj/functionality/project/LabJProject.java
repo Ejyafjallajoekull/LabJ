@@ -9,22 +9,32 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.logging.Level;
 
+import labj.functionality.housekeeping.configuration.ConfigurationHandler;
+import labj.functionality.packs.OrganismPack;
+import labj.functionality.packs.SubstancePack;
+import labj.functionality.packs.TaxonomyPack;
 import labjframework.logging.LoggingHandler;
 import labjframework.packs.Pack;
+import labjframework.packs.PackHandler;
 import labjframework.utilities.ByteUtilities;
 
-public class LabJProject {
+public class LabJProject extends PackHandler {
 // a project file holding all informations on the current session
+/* this does only summarise which packs present in the pack folder should be
+ * checked for loading, actually data loading only occurs in the specified
+ * PackHandler */
 	
 	// constants
-	public static final byte[] VERSION = {0}; // the version byte for this file format
+	public static final byte[] VERSION = {1}; // the version byte for this file format
 	public static final String HEADER = "LabJProject"; // the file header required for file recognition
 	public static final String FILE_EXTENSION = "labj"; // the regular file extension for project files
 	
-	private ArrayList<Pack> projectPacks = new ArrayList<Pack>(); // packs which were loaded into the project
+	@SuppressWarnings("rawtypes")
+	public static final Class[] packClasses = {SubstancePack.class, TaxonomyPack.class, OrganismPack.class};
+	
+//	private ArrayList<Pack> projectPacks = new ArrayList<Pack>(); // packs which were loaded into the project
 	private File projectFile = null; // the file this project is stored in
 	private Charset stringEncoding = StandardCharsets.UTF_8;
 	
@@ -37,24 +47,6 @@ public class LabJProject {
 		this.projectFile = file;
 	}
 	
-	public boolean addPack(Pack pack) {
-		if (pack != null && !projectPacks.contains(pack)) {
-			return projectPacks.add(pack);
-		}
-		return false;
-	}
-	
-	public boolean removePack(Pack pack) {
-		if (pack != null) {
-			return this.projectPacks.remove(pack);
-		}
-		return false;
-	}
-	
-	public ArrayList<Pack> getProjectPacks() {
-		return this.projectPacks;
-	}
-	
 	public File getProjectFile() {
 		return this.projectFile;
 	}
@@ -64,7 +56,7 @@ public class LabJProject {
 	}
 	
 	// load data from this project file
-	public boolean load() {
+	public boolean loadProject() {
 		if (this.projectFile != null && this.projectFile.isFile()) {
 			try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(this.projectFile))) {
 				if (bis.available() >= HEADER.getBytes(this.stringEncoding).length + VERSION.length) { // read file only if enough bytes for header and version byte
@@ -95,19 +87,19 @@ public class LabJProject {
 	}
 	
 	// load data from a project file
-	public boolean load(File file) {
+	public boolean loadProject(File file) {
 		this.projectFile = file;
-		return this.load();
+		return this.loadProject();
 	}
 	
 	// save the current project to the specified project file
-	public boolean save() {
+	public boolean saveProject() {
 		if (this.projectFile != null) {
 			try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(this.projectFile))) { // auto close writer
 				bos.write(HEADER.getBytes(this.stringEncoding));
 				bos.write(VERSION);
-				bos.write(ByteUtilities.integerToByte(this.projectPacks.size()));
-				for (Pack pack : this.projectPacks) { // save packs as combination of pack class and pack file
+				bos.write(ByteUtilities.integerToByte(this.loadedPacks.size()));
+				for (Pack pack : this.loadedPacks) { // save packs as combination of pack class and pack file
 					bos.write(ByteUtilities.stringLengthToByte(pack.getClass().getName(), this.stringEncoding));
 					bos.write(pack.getClass().getName().getBytes(this.stringEncoding));
 					bos.write(ByteUtilities.stringLengthToByte(pack.getPackFile().getName(), this.stringEncoding));
@@ -124,30 +116,27 @@ public class LabJProject {
 	}
 	
 	// save the current project to a file
-	public boolean save(File file) {
+	public boolean saveProject(File file) {
 		if (file != null) {
 			this.projectFile = file;
-			return this.save();
+			return this.saveProject();
 		}
 		return false;
 	}
 	
-	
-	private void loadPack(String className, String fileName) {
-		System.out.println(className + "::" + fileName);
-		try {
-			@SuppressWarnings("unchecked")
-			Class<? extends Pack> pack = (Class<? extends Pack>) Class.forName(className);
-			try {
-				pack.getConstructor(File.class);
-			} catch (NoSuchMethodException | SecurityException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+	// load a pack from the specified file in the pack folder
+	private boolean loadPack(String className, String fileName) {
+		return this.loadPack(new File(ConfigurationHandler.getPackFolder(), fileName), className);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void loadPacks(File file) {
+		if (packClasses != null) {
+			for (Class<? extends Pack> packClass : packClasses) {
+				this.loadPack(file, packClass);
 			}
-		} catch (ClassNotFoundException e) {
-			LoggingHandler.getLog().log(Level.WARNING, "Class \"" + className + "\" not found", e);
-			e.printStackTrace();
-		}
+		}		
 	}
 	
 }
