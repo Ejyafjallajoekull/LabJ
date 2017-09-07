@@ -81,15 +81,19 @@ public abstract class PackHandler {
 		LoggingHandler.getLog().finest("All packs have been unloaded");
 	}
 	
-	// load a specific pack from a pack file
-	public boolean loadPack(File file, Class<? extends Pack> packClass) {
+	// load a specific pack from a pack file // boolean: load even if it's an empty pack or not?
+	public boolean loadPack(File file, Class<? extends Pack> packClass, boolean loadEmptyPack) {
 		if (file != null && packClass != null) {
-			try {
+			try { // get the appropriate constructor
 				Constructor<? extends Pack> packConstructor = packClass.getConstructor(File.class);
 				try {
-					this.loadedPacks.add(packConstructor.newInstance(file)); // add a instance of this pack to the list of loaded packs
-					LoggingHandler.getLog().fine(packClass.getName() + " loaded from " + file);
-					return true;
+					Pack pack = packConstructor.newInstance(file);
+					if (loadEmptyPack || pack.getEntryCount() > 0) {
+						System.out.println("PackClass: " + pack.getClass().getName());
+						this.loadedPacks.add(pack); // add a instance of this pack to the list of loaded packs
+						LoggingHandler.getLog().fine(packClass.getName() + " loaded from " + file);
+						return true;
+					}
 				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 						| InvocationTargetException e) {
 					LoggingHandler.getLog().log(Level.SEVERE, "Dynamic pack creation failed for " + file + "::" + packClass.getName(), e);
@@ -103,11 +107,11 @@ public abstract class PackHandler {
 		return false;
 	}
 	
-	public boolean loadPack(File file, String className) {
+	public boolean loadPack(File file, String className, boolean loadEmptyPack) {
 		try {
 			@SuppressWarnings("unchecked")
 			Class<? extends Pack> packClass = (Class<? extends Pack>) Class.forName(className);
-			return loadPack(file, packClass);
+			return loadPack(file, packClass, loadEmptyPack);
 		} catch (ClassNotFoundException e) {
 			LoggingHandler.getLog().log(Level.SEVERE, "Dynamic pack creation failed for " + file + "::" + className, e);
 			e.printStackTrace();

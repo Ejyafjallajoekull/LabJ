@@ -81,9 +81,7 @@ public class LabJMainFrame extends JFrame {
 	}
 	
 	public void managePacks() {
-		for (File file : (new PackManagerDialog(this)).getPackFolderFiles()) {
-			System.out.println(file);
-		}
+		new PackManagerDialog(this);
 	}
 	
 	public boolean openFile() {

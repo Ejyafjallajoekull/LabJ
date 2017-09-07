@@ -6,10 +6,10 @@ import java.util.logging.Level;
 
 import javax.swing.JFrame;
 
-import labj.functionality.packs.LabJPackHandler;
 import labj.functionality.packs.SubstancePack;
 import labj.functionality.packs.Taxonomy;
 import labj.functionality.packs.TaxonomyPack;
+import labj.functionality.project.LabJProject;
 import labj.gui.display.LabJMainFrame;
 import labjframework.logging.LoggingHandler;
 import labjframework.packs.PackHandler;
@@ -48,8 +48,8 @@ public class LabJStartingClass {
 	private static void test() {
 		LoggingHandler.getLog().setLevel(Level.ALL);
 		LoggingHandler.startLogWriting();
-		PackHandler ph = new LabJPackHandler();
-		ph.loadPack(new File("sp_test_01.xml"));
+		LabJProject ph = new LabJProject();
+		ph.loadPacks(new File("sp_test_01.xml"));
 //		SubstancePack sp = new SubstancePack(new File("sp_test_01.xml"));
 		SubstancePack sp = (SubstancePack) ph.getLoadedPacks(SubstancePack.class).get(0);
 		sp.setHandler(ph); // handler necessary for references to work

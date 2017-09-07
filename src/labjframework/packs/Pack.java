@@ -30,7 +30,7 @@ import labjframework.utilities.Configurations;
 import labjframework.utilities.XMLFormattedText;
 
 public abstract class Pack {
-// abstract class representing a XML file containing information structured in a LabJ compatible way
+// abstract class representing (a part of a) XML file containing information structured in a LabJ compatible way
 	
 	// fields
 	protected ArrayList<PackEntry> entries = new ArrayList<PackEntry>(); // a list of all entries in the pack
@@ -482,6 +482,13 @@ public abstract class Pack {
 	
 	public ArrayList<PackEntry> getEntries() {
 		return entries;
+	}
+	
+	public int getEntryCount() {
+		if (this.entries != null) {
+			return entries.size();
+		}
+		return -1; // return an error
 	}
 
 	public PackHandler getHandler() {

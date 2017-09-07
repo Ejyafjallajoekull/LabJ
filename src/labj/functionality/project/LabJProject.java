@@ -22,17 +22,14 @@ import labjframework.utilities.ByteUtilities;
 
 public class LabJProject extends PackHandler {
 // a project file holding all informations on the current session
-/* this does only summarise which packs present in the pack folder should be
- * checked for loading, actually data loading only occurs in the specified
- * PackHandler */
 	
 	// constants
-	public static final byte[] VERSION = {1}; // the version byte for this file format
+	public static final byte[] VERSION = {2}; // the version byte for this file format
 	public static final String HEADER = "LabJProject"; // the file header required for file recognition
 	public static final String FILE_EXTENSION = "labj"; // the regular file extension for project files
 	
 	@SuppressWarnings("rawtypes")
-	public static final Class[] packClasses = {SubstancePack.class, TaxonomyPack.class, OrganismPack.class};
+	public static final Class[] PACK_CLASSES = {SubstancePack.class, TaxonomyPack.class, OrganismPack.class};
 	
 //	private ArrayList<Pack> projectPacks = new ArrayList<Pack>(); // packs which were loaded into the project
 	private File projectFile = null; // the file this project is stored in
@@ -126,15 +123,15 @@ public class LabJProject extends PackHandler {
 	
 	// load a pack from the specified file in the pack folder
 	private boolean loadPack(String className, String fileName) {
-		return this.loadPack(new File(ConfigurationHandler.getPackFolder(), fileName), className);
+		return this.loadPack(new File(ConfigurationHandler.getPackFolder(), fileName), className, true);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void loadPacks(File file) {
-		if (packClasses != null) {
-			for (Class<? extends Pack> packClass : packClasses) {
-				this.loadPack(file, packClass);
+		if (PACK_CLASSES != null) {
+			for (Class<? extends Pack> packClass : PACK_CLASSES) {
+				this.loadPack(file, packClass, false); // only loads packs from this file that are not empty
 			}
 		}		
 	}
