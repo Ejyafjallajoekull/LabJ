@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
@@ -52,10 +53,10 @@ public abstract class Pack {
 
 	// constructor
 	public Pack(File file, String node, String[] subProperties) {
+		this.node = node;
+		this.subProperties = subProperties;
 		if (file != null) {
 			this.packFile = file;
-			this.node = node;
-			this.subProperties = subProperties;
 			// load the XML to the memory
 			this.isLoaded = this.load();
 		} else {
@@ -66,7 +67,6 @@ public abstract class Pack {
 	// abstract methods
 	public abstract boolean loadEntry(Element entry); // implementation for all different entries on how to load them and their properties
 	public abstract void updateCustomProperties(Node parentNode, PackEntry entry); // just updates the custom properties // handle regular properties in a predefined function
-	
 	
 	// methods
 	// save this pack to XML
@@ -498,4 +498,32 @@ public abstract class Pack {
 	public void setHandler(PackHandler handler) {
 		this.handler = handler;
 	}
+	
+	public String getNodeName() {
+		return this.node;
+	}
+	
+	public static boolean isPackType(File file, Class<? extends Pack> type) {
+		if (file != null && type != null && file.isFile()) {
+			try {
+				DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+					try {
+						Document doc = db.parse(file); // parse the file
+						Constructor<? extends Pack> con = type.getConstructor(File.class);
+						Pack dummy = con.newInstance((File) null);
+						if (doc.getElementsByTagName(dummy.getNodeName()).getLength() > 0) { // look for valid entries with the specified root
+							return true; // loading the XML worked
+						}
+					} catch (Exception e) { // loading failed
+						LoggingHandler.getLog().log(Level.SEVERE, "Could not load " + file, e);
+						e.printStackTrace();
+					}
+			} catch (Exception e) { // loading failed
+				LoggingHandler.getLog().log(Level.SEVERE, "Could not initialise a DocumentBuilder", e);
+				e.printStackTrace();
+			}
+		}
+		return false;
+	}
+
 }

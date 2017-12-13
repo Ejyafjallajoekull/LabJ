@@ -3,6 +3,7 @@ package labj.gui.display.manage;
 import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
 
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 public class PackDetailsPanel extends JPanel {
@@ -12,6 +13,7 @@ public class PackDetailsPanel extends JPanel {
 
 	public PackDetailsPanel(String title) {
 		super(new GridBagLayout());
+		this.setBorder(BorderFactory.createTitledBorder(title));
 		this.init();
 	}
 
@@ -31,6 +33,6 @@ public class PackDetailsPanel extends JPanel {
 	}
 
 	private void init() {
-		
+			
 	}
 }

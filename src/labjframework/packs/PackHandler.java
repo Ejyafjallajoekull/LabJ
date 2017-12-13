@@ -112,7 +112,7 @@ public abstract class PackHandler {
 			@SuppressWarnings("unchecked")
 			Class<? extends Pack> packClass = (Class<? extends Pack>) Class.forName(className);
 			return loadPack(file, packClass, loadEmptyPack);
-		} catch (ClassNotFoundException e) {
+		} catch (Exception e) {
 			LoggingHandler.getLog().log(Level.SEVERE, "Dynamic pack creation failed for " + file + "::" + className, e);
 			e.printStackTrace();
 		}

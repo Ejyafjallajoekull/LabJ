@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -24,7 +23,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
-import javax.swing.SpringLayout.Constraints;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
@@ -49,7 +47,7 @@ public class PackManagerDialog extends JDialog{
 	
 	private static final String DETAILS_TITLE = "Details";
 	private static final String DETAILS_ENTRIES = "Entries";
-	private static final String DETAILS_DEPENDENCIES = "Dpendencies";
+	private static final String DETAILS_DEPENDENCIES = "Dependencies";
 	private static final String DETAILS_PACKS = "Packs";
 	private static final String DETAILS_NAME = "Name";
 	private static final String DETAILS_NULL_VALUE = "-----"; // String displayed if nothing is selected
@@ -121,33 +119,26 @@ public class PackManagerDialog extends JDialog{
 		buttonCancel.addActionListener(l -> this.closeWindow());
 		
 		// details panel
-		JPanel detailsPanel = new JPanel();
-		detailsPanel.setLayout(new GridBagLayout());
+		JPanel detailsPanel = new PackDetailsPanel(DETAILS_TITLE);
 		panelConstraints.gridx = 0;
 		panelConstraints.gridy = 0;
-		detailsPanel.setBorder(BorderFactory.createTitledBorder(DETAILS_TITLE));
 		// name display
-		JPanel detailsNamePanel = new JPanel();
-		detailsNamePanel.setLayout(new GridBagLayout());
-		detailsNamePanel.setBorder(BorderFactory.createTitledBorder(DETAILS_NAME));
+		JPanel detailsNamePanel = new PackDetailsPanel(DETAILS_NAME);
 		detailsNamePanel.add(detailsNameValue);
 		detailsPanel.add(detailsNamePanel, panelConstraints);
 		//pack display
 		panelConstraints.gridy = 1;
-		JPanel detailsPacksPanel = new JPanel();
-		detailsPacksPanel.setBorder(BorderFactory.createTitledBorder(DETAILS_PACKS));
+		JPanel detailsPacksPanel = new PackDetailsPanel(DETAILS_PACKS);
 		detailsPacksPanel.add(detailsPacksValue);
 		detailsPanel.add(detailsPacksPanel, panelConstraints);
 		// dependencies display
 		panelConstraints.gridy = 2;
-		JPanel detailsDependenciesPanel = new JPanel();
-		detailsDependenciesPanel.setBorder(BorderFactory.createTitledBorder(DETAILS_DEPENDENCIES));
+		JPanel detailsDependenciesPanel = new PackDetailsPanel(DETAILS_DEPENDENCIES);
 		detailsDependenciesPanel.add(detailsDependenciesValue);
 		detailsPanel.add(detailsDependenciesPanel, panelConstraints);
 		// entry display
 		panelConstraints.gridy = 3;
-		JPanel detailsEntriesPanel = new JPanel();
-		detailsEntriesPanel.setBorder(BorderFactory.createTitledBorder(DETAILS_ENTRIES));
+		JPanel detailsEntriesPanel = new PackDetailsPanel(DETAILS_ENTRIES);
 		detailsEntriesPanel.add(detailsEntriesValue);
 		detailsPanel.add(detailsEntriesPanel, panelConstraints);
 		
@@ -225,20 +216,34 @@ public class PackManagerDialog extends JDialog{
 	public void updateDetails() {
 		if (selectedNodes != null) {
 			ArrayList<File> files = new ArrayList<File>();
-			ArrayList<Pack> packs = new ArrayList<Pack>();
+			ArrayList<String> packs = new ArrayList<String>();
+//			ArrayList<Pack> packs = new ArrayList<Pack>();
+			File file = null;
 			for (DefaultMutableTreeNode node : selectedNodes) {
 				if (node.getUserObject() != null) {
 					if (node.getUserObject() instanceof File &&  !files.contains((File) node.getUserObject())) {
-						files.add((File) node.getUserObject());
-						LabJProject dummyProject = new LabJProject(); // create a PackHandler
-						dummyProject.loadPacks((File) node.getUserObject()); // load all packs from this file
-						for (Pack pack : dummyProject.getLoadedPacks()) { // add all packs contained by this file to the list of selected packs
-							if (pack != null && !packs.contains(pack)) {
-								packs.add(pack);
+						file = (File) node.getUserObject();
+						files.add(file);
+//						LabJProject dummyProject = new LabJProject(); // create a PackHandler
+//						dummyProject.loadPacks((File) node.getUserObject()); // load all packs from this file
+//						for (Pack pack : dummyProject.getLoadedPacks()) { // add all packs contained by this file to the list of selected packs
+//							if (pack != null && !packs.contains(pack)) {
+//								packs.add(pack);
+//							}
+//						}
+//						
+					for (@SuppressWarnings("rawtypes") Class c : LabJProject.PACK_CLASSES) { // add all packs contained by this file to the list of selected packs
+						if (Pack.isPackType(file, c)) {
+							String s = file + ":" + c.getName();
+							if ( s != null && !packs.contains(s)) {
+								packs.add(s);
 							}
 						}
+
+					}
+						
 					} else if (node.getUserObject() instanceof Pack &&  !packs.contains((Pack) node.getUserObject())) {
-						packs.add((Pack) node.getUserObject());
+						packs.add(((Pack) node.getUserObject()).toString());
 					}
 					
 				}
