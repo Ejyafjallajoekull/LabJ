@@ -30,6 +30,13 @@ import labjframework.logging.LoggingHandler;
 import labjframework.utilities.Configurations;
 import labjframework.utilities.XMLFormattedText;
 
+/**
+ * The Pack class is the abstract representation of an XML file containing 
+ * information structured in a LabJ compatible way.
+ * 
+ * @author Planters
+ *
+ */
 public abstract class Pack {
 // abstract class representing (a part of a) XML file containing information structured in a LabJ compatible way
 	
